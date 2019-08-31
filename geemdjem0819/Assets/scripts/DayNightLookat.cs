@@ -5,9 +5,10 @@ public class DayNightLookat : MonoBehaviour
     private Vector3 blerp;
     private void Start()
     {
-        blerp = new Vector3 { x = gameObject.transform.position.x,
-                              y = gameObject.transform.position.y,
-                              z = gameObject.transform.position.z -3};
+        var position = gameObject.transform.position;
+        blerp = new Vector3 { x = position.x,
+                              y = position.y,
+                              z = position.z -3};
     }
     private void Update()
     {

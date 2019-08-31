@@ -3,62 +3,73 @@
 public class DragManager : MonoBehaviour
 {
     public float catchingDistance = 3f;
-    public GameObject draggingObject;
-    private bool isDraggingAnObject { get; set; }
+    private Camera _camera;
+    private bool IsDraggingAnObject { get; set; }
+
+    private Rigidbody _draggingRigidBody;
+    private bool _foundRigidBody;
+
+    private void Awake()
+    {
+        _camera = Camera.main;
+    }
+
     protected void Start()
     {
-        isDraggingAnObject = false;
+        IsDraggingAnObject = false;
     }
 
     protected void Update()
     {
         if (Input.GetMouseButton(0))
         {
-            if (!isDraggingAnObject)
+            if (!IsDraggingAnObject)
             {
-                draggingObject = GetObjectFromMouseRaycast();
+                _foundRigidBody = GetObjectFromMouseRaycast(out _draggingRigidBody);
+                if (!_foundRigidBody) return;
                 
-                if (draggingObject && draggingObject?.GetComponent<IDraggable>()?.isDraggable == true)
+                
+                var isDraggable = _draggingRigidBody.GetComponent<IDraggable>();
+                if (isDraggable != null && isDraggable.isDraggable)
                 {
-                    draggingObject.GetComponent<Rigidbody>().isKinematic = true;
-                    isDraggingAnObject = true;
+                    _draggingRigidBody.isKinematic = true;
+                    IsDraggingAnObject = true;
                 }
             }
-            else if (draggingObject != null)
+            else if (_foundRigidBody)
             {
-                draggingObject.GetComponent<Rigidbody>().MovePosition(GetMouseWorldSpacePosition());
+                _draggingRigidBody.MovePosition(GetMouseWorldSpacePosition());
             }
         }
         else
         {
-            if (draggingObject != null)
+            if (_foundRigidBody)
             {
-                draggingObject.GetComponent<Rigidbody>().isKinematic = false;
+                _draggingRigidBody.isKinematic = false;
             }
-            isDraggingAnObject = false;
+            IsDraggingAnObject = false;
+            _foundRigidBody = false;
         }
     }
 
-    public GameObject GetObjectFromMouseRaycast()
+    private bool GetObjectFromMouseRaycast(out Rigidbody foundRb)
     {
-        GameObject gameObject = null;
-        bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo);
-        if (hit)
+        foundRb = null;
+        var hit = Physics.Raycast(_camera.ScreenPointToRay(Input.mousePosition), out var hitInfo);
+        
+        if (hit && hitInfo.rigidbody && Vector3.Distance(hitInfo.point, transform.position) <= catchingDistance)
         {
-            if (hitInfo.collider.gameObject.GetComponent<Rigidbody>() &&
-                Vector3.Distance(hitInfo.collider.gameObject.transform.position,
-                transform.position) <= catchingDistance)
-            {
-                gameObject = hitInfo.collider.gameObject;
-            }
+            foundRb = hitInfo.rigidbody;
+            return true;
         }
-        return gameObject;
+        return false;
     }
-    public Vector3 GetMouseWorldSpacePosition()
+
+    private Vector3 GetMouseWorldSpacePosition()
     {
-        Vector3 mouseWorldPosition = Input.mousePosition;
+        var mouseWorldPosition = Input.mousePosition;
         mouseWorldPosition.z = catchingDistance;
-        mouseWorldPosition = Camera.main.ScreenToWorldPoint(mouseWorldPosition);
+        mouseWorldPosition = _camera.ScreenToWorldPoint(mouseWorldPosition);
         return mouseWorldPosition;
     }
 }

@@ -1,30 +1,27 @@
-﻿using UnityEngine;
+﻿using mechanics;
+using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody)),
+ RequireComponent(typeof(Draggable)),
+ RequireComponent(typeof(GrowController))]
 public class GrowthStarter : MonoBehaviour
 {
-    public float germinationTime = 5f;
-    public Draggable draggable;
-    public Rigidbody rigidBody;
+    private Draggable _draggable;
+    private Rigidbody _rigidBody;
+    private GrowController _growController;
 
     private void Start()
     {
-        draggable = gameObject.GetComponent<Draggable>();
-        rigidBody = gameObject.GetComponent<Rigidbody>();
-    }
-
-    private void Update()
-    {
-        if (germinationTime <= 0)
-        {
-            MakeUndraggable();
-        }
+        _draggable = gameObject.GetComponent<Draggable>();
+        _rigidBody = gameObject.GetComponent<Rigidbody>();
+        _growController = gameObject.GetComponent<GrowController>();
     }
 
     private void MakeUndraggable()
     {
-        Destroy(draggable);
-        rigidBody.isKinematic = true;
+        _growController.enabled = true;
+        _draggable.enabled = false;
+        _rigidBody.isKinematic = true;
         Destroy(this);
     }
 
@@ -32,12 +29,7 @@ public class GrowthStarter : MonoBehaviour
     {
         if (other.CompareTag("Soil"))
         {
-            germinationTime -= Time.deltaTime * 1f;
+           MakeUndraggable();
         }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        germinationTime = 5f; //todo: attach to gameTick
     }
 }
