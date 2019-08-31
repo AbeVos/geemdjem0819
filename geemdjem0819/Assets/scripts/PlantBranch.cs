@@ -75,9 +75,13 @@ public class PlantBranch : MonoBehaviour
     }
 
     protected void Update() {
-        growDirection = Quaternion.LookRotation(
-            growTarget.position - growBase.position, Vector3.up
-        );
+        var direction = growTarget.position - growBase.position;
+
+        if (direction.magnitude > 0f) {
+            growDirection = YLookRotation(
+                direction.normalized, Vector3.up
+            );
+        }
 
         if (isGrowing) {
             UpdateBranch();
@@ -106,9 +110,9 @@ public class PlantBranch : MonoBehaviour
                 segment.parent = transform;
             }
             else {
-                Debug.Log(branchSegments.Count);
                 var last = branchSegments[branchSegments.Count - 1];
-                segment.parent = last;
+                // segment.parent = last;
+                segment.parent = transform;
                 growBase.parent = last;
             }
             branchSegments.Add(segment);
@@ -129,4 +133,11 @@ public class PlantBranch : MonoBehaviour
 
         return vertices;
     }
+
+Quaternion YLookRotation(Vector3 right, Vector3 up) {
+    Quaternion upToForward = Quaternion.Euler(90f, 0f, 0f);
+    Quaternion forwardToTarget = Quaternion.LookRotation(right, up);
+
+    return forwardToTarget * upToForward;
+}
 }
