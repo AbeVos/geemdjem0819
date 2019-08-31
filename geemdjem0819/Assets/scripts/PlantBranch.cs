@@ -2,21 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct Ring {
+public struct Ring
+{
     private List<Vector3> vertices;
 
     public Vector3 position;
     public Quaternion rotation;
     public Vector3 scale;
 
-    public Ring(Transform transform, float radius, int n_vertices) {
+    public Ring(Transform transform, float radius, int nVertices)
+    {
         vertices = new List<Vector3>();
         position = transform.position;
         rotation = transform.rotation;
         scale = transform.localScale;
 
-        for (int i = 0; i < n_vertices; i++) {
-            var t = 2 * Mathf.PI * i / n_vertices;
+        for (int i = 0; i < nVertices; i++) {
+            var t = 2 * Mathf.PI * i / nVertices;
 
             var x = radius * Mathf.Cos(t);
             var z = radius * Mathf.Sin(t);
@@ -26,11 +28,30 @@ public struct Ring {
             vertices.Add(vertex);
         }
     }
+
+    /// Retrieve transformed vertices from this Ring.
+    public List<Vector3> Vertices
+    {
+        get {
+            var matrix = Matrix4x4.TRS(position, rotation, scale);
+
+            var transformedVertices = new List<Vector3>();
+
+            foreach (Vector3 vector in vertices) {
+                transformedVertices.Add(matrix.MultiplyPoint3x4(vector));
+            }
+
+            return transformedVertices;
+        }
+        private set { vertices = value; }
+    }
 }
 
 [RequireComponent(typeof(MeshFilter))]
 public class PlantBranch : MonoBehaviour
 {
+    public int nVertices = 8;
+
     public float segmentLength = 1f;
     public float growSpeed = 1f;
     public float turnSpeed = 3f;
@@ -51,6 +72,7 @@ public class PlantBranch : MonoBehaviour
     private MeshFilter meshFilter;
 
     private List<Transform> branchSegments;
+    private List<Ring> branchRings;
 
     protected void Start() {
         growBase = new GameObject().transform;
@@ -59,6 +81,8 @@ public class PlantBranch : MonoBehaviour
         growDirection = new Quaternion();
 
         branchSegments = new List<Transform>();
+        branchRings = new List<Ring>();
+        branchRings.Add(new Ring(growBase, 1f, nVertices));
 
         meshFilter = GetComponent<MeshFilter>();
         
@@ -104,22 +128,29 @@ public class PlantBranch : MonoBehaviour
         */
     }
 
-    protected void Update() {
+    protected void Update()
+    {
         var direction = growTarget.position - growBase.position;
 
-        if (direction.magnitude > 0f) {
+        if (direction.magnitude > 0f)
+        {
             growDirection = YLookRotation(direction.normalized, Vector3.up);
         }
 
-        if (isGrowing) {
+        if (isGrowing)
+        {
             TickBranch();
         }
     }
 
-    public void TickBranch() {
+    /// Update the branch growing.
+    public void TickBranch()
+    {
+        // Rotate growBase towards its target and add some noise to the rotation.
         growBase.rotation = Quaternion.RotateTowards(
             growBase.rotation, growDirection, Mathf.PI * turnSpeed * Time.deltaTime
         ) * Random.rotation.Pow(Time.deltaTime * directionVariance);
+
         var position = growBase.position;
         position += Time.deltaTime * growSpeed * growBase.up;
 
@@ -127,45 +158,48 @@ public class PlantBranch : MonoBehaviour
 
         // Create a new segment once the tip has moved far enouch away
         // from the rest of the branch.
-        if (Vector3.Distance(lastPosition, position) > segmentLength) {
+        if (Vector3.Distance(lastPosition, position) > segmentLength)
+        {
             lastPosition = position;
 
-            var segment = GameObject.CreatePrimitive(PrimitiveType.Cylinder).transform;
-            segment.position = growBase.position;
-            segment.rotation = growBase.rotation;
-
-            if (branchSegments.Count == 0) {
-                segment.parent = transform;
-            }
-            else {
-                var last = branchSegments[branchSegments.Count - 1];
-                // segment.parent = last;
-                segment.parent = transform;
-                growBase.parent = last;
-            }
-            branchSegments.Add(segment);
+            branchRings.Add(new Ring(growBase, 1f, nVertices));
+            GenerateMesh();
         }
     }
 
-    /// Create a circle of vertices.
-    private List<Vector3> CreateCircle(Transform transform, float radius, int n_vertices) {
-        var vertices = new List<Vector3>();
+    /// Update the MeshFilter's mesh using the branchRings' vertices.
+    public void GenerateMesh()
+    {
+        var vertexList = new List<Vector3>();
 
-        for (int i=0; i<n_vertices; i++) {
-            var t = 2 * Mathf.PI * i / n_vertices;
-
-            var x = radius * Mathf.Cos(t);
-            var z = radius * Mathf.Sin(t);
-
-            var vertex = new Vector3(x, 0, z);
-
-            vertices.Add(vertex);
+        foreach (Ring ring in branchRings)
+        {
+            vertexList.AddRange(ring.Vertices);
         }
 
-        return vertices;
+        var vertexArray = vertexList.ToArray();
+
+        meshFilter.mesh.vertices = vertexArray;
+
+        var numRings = branchRings.Count;
+        var numQuads = (numRings - 1) * nVertices;
+
+        var tris = new int[3 * numQuads];
+
+        for (var i = 0; i < numQuads; i++)
+        {
+            tris[3*i] = i;
+            tris[3*i+1] = i + nVertices;
+            tris[3*i+2] = ((i + 1) % nVertices) + (i - (i % nVertices));
+        }
+
+        meshFilter.mesh.triangles = tris;
+
+        meshFilter.mesh.RecalculateNormals();
     }
 
-    private Quaternion YLookRotation(Vector3 right, Vector3 up) {
+    private Quaternion YLookRotation(Vector3 right, Vector3 up)
+    {
         Quaternion upToForward = Quaternion.Euler(90f, 0f, 0f);
         Quaternion forwardToTarget = Quaternion.LookRotation(right, up);
 
