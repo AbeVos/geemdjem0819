@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace interfaces
+namespace mechanics.nutrients
 {
     public abstract class Nutrient : MonoBehaviour
     {
