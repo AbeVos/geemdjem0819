@@ -5,7 +5,6 @@ public class DragManager : MonoBehaviour
     public float catchingDistance = 3f;
     public GameObject draggingObject;
     private bool isDraggingAnObject { get; set; }
-
     protected void Start()
     {
         isDraggingAnObject = false;
@@ -18,7 +17,8 @@ public class DragManager : MonoBehaviour
             if (!isDraggingAnObject)
             {
                 draggingObject = GetObjectFromMouseRaycast();
-                if (draggingObject && draggingObject?.GetComponent<IDraggable>().isDraggable == true)
+                
+                if (draggingObject && draggingObject?.GetComponent<IDraggable>()?.isDraggable == true)
                 {
                     draggingObject.GetComponent<Rigidbody>().isKinematic = true;
                     isDraggingAnObject = true;
