@@ -17,11 +17,11 @@ public class GrowthStarter : MonoBehaviour
     {
         if (germinationTime <= 0)
         {
-            OkDoei();
+            MakeUndraggable();
         }
     }
 
-    private void OkDoei()
+    private void MakeUndraggable()
     {
         Destroy(draggable);
         rigidBody.isKinematic = true;
@@ -30,7 +30,7 @@ public class GrowthStarter : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.tag == "Soil")
+        if (other.CompareTag("Soil"))
         {
             germinationTime -= Time.deltaTime * 1f;
         }
@@ -38,6 +38,6 @@ public class GrowthStarter : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        germinationTime = 5f;
+        germinationTime = 5f; //todo: attach to gameTick
     }
 }
