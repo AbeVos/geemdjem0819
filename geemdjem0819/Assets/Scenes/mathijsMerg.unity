@@ -1026,7 +1026,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 498449143}
-  m_LocalRotation: {x: 0.22975151, y: -0.0033997481, z: 0.00080274633, w: 0.9732431}
+  m_LocalRotation: {x: 0.22975151, y: -0.0033997481, z: 0.00080274616, w: 0.9732431}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1184,6 +1184,8 @@ GameObject:
   - component: {fileID: 1017686620}
   - component: {fileID: 1017686626}
   - component: {fileID: 1017686623}
+  - component: {fileID: 1017686627}
+  - component: {fileID: 1017686628}
   m_Layer: 0
   m_Name: Placeholder_Seed 3
   m_TagString: Untagged
@@ -1231,7 +1233,7 @@ CapsuleCollider:
   m_Enabled: 1
   m_Radius: 0.5
   m_Height: 2
-  m_Direction: 1
+  m_Direction: 0
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1017686623
 MonoBehaviour:
@@ -1240,13 +1242,15 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1017686619}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 07cba8c5e639f114f8701de8813bb90e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  plantPrefab: {fileID: 7571377296102923225, guid: b318318c688fe43cb9afec5c57897f7b,
+    type: 3}
   growCyclesTillSeed: 20
-  germinationCycles: 10
+  germinationCycles: 3
 --- !u!33 &1017686624
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1281,6 +1285,65 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2239df51c94050144aa364c1437eb749, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!23 &1017686627
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1017686619}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: da6940b0905d70f449dee3d728cf2712, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!114 &1017686628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1017686619}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d03278459125a543b80829977ae289d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nVertices: 12
+  branchRadius: 1
+  startRadius: 1
+  tipFalloff: 15
+  segmentLength: 0.55
+  growSpeed: 8.17
+  turnSpeed: 20
+  directionVariance: 1.12
+  growTarget: {fileID: 0}
 --- !u!1 &1184041246
 GameObject:
   m_ObjectHideFlags: 0
@@ -1296,6 +1359,8 @@ GameObject:
   - component: {fileID: 1184041247}
   - component: {fileID: 1184041253}
   - component: {fileID: 1184041250}
+  - component: {fileID: 1184041254}
+  - component: {fileID: 1184041255}
   m_Layer: 0
   m_Name: Placeholder_Seed 2
   m_TagString: Untagged
@@ -1343,7 +1408,7 @@ CapsuleCollider:
   m_Enabled: 1
   m_Radius: 0.5
   m_Height: 2
-  m_Direction: 1
+  m_Direction: 0
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1184041250
 MonoBehaviour:
@@ -1352,13 +1417,15 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1184041246}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 07cba8c5e639f114f8701de8813bb90e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  plantPrefab: {fileID: 7571377296102923225, guid: b318318c688fe43cb9afec5c57897f7b,
+    type: 3}
   growCyclesTillSeed: 20
-  germinationCycles: 10
+  germinationCycles: 3
 --- !u!33 &1184041251
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1393,6 +1460,65 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2239df51c94050144aa364c1437eb749, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!23 &1184041254
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1184041246}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: da6940b0905d70f449dee3d728cf2712, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!114 &1184041255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1184041246}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d03278459125a543b80829977ae289d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nVertices: 12
+  branchRadius: 1
+  startRadius: 1
+  tipFalloff: 15
+  segmentLength: 0.55
+  growSpeed: 8.17
+  turnSpeed: 20
+  directionVariance: 1.12
+  growTarget: {fileID: 0}
 --- !u!1 &1277622302
 GameObject:
   m_ObjectHideFlags: 0
@@ -1899,7 +2025,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1452410001}
   m_LocalRotation: {x: 0.23404801, y: 0.08228265, z: -0.065824404, w: 0.96649796}
-  m_LocalPosition: {x: 0, y: -0.01, z: 0}
+  m_LocalPosition: {x: 0.04, y: 0.19, z: 0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -2226,6 +2352,8 @@ GameObject:
   - component: {fileID: 1846487536}
   - component: {fileID: 1846487537}
   - component: {fileID: 1846487533}
+  - component: {fileID: 1846487538}
+  - component: {fileID: 1846487539}
   m_Layer: 0
   m_Name: Placeholder_Seed 1
   m_TagString: Untagged
@@ -2261,7 +2389,7 @@ CapsuleCollider:
   m_Enabled: 1
   m_Radius: 0.5
   m_Height: 2
-  m_Direction: 1
+  m_Direction: 0
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1846487533
 MonoBehaviour:
@@ -2270,13 +2398,15 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1846487530}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 07cba8c5e639f114f8701de8813bb90e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  plantPrefab: {fileID: 7571377296102923225, guid: b318318c688fe43cb9afec5c57897f7b,
+    type: 3}
   growCyclesTillSeed: 20
-  germinationCycles: 10
+  germinationCycles: 3
 --- !u!33 &1846487534
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2323,6 +2453,65 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2239df51c94050144aa364c1437eb749, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!23 &1846487538
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1846487530}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: da6940b0905d70f449dee3d728cf2712, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!114 &1846487539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1846487530}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d03278459125a543b80829977ae289d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nVertices: 12
+  branchRadius: 1
+  startRadius: 1
+  tipFalloff: 15
+  segmentLength: 0.55
+  growSpeed: 8.17
+  turnSpeed: 20
+  directionVariance: 1.12
+  growTarget: {fileID: 0}
 --- !u!1 &2035822187
 GameObject:
   m_ObjectHideFlags: 0

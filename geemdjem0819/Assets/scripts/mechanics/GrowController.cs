@@ -6,8 +6,7 @@ namespace mechanics
 {
     public class GrowController : MonoBehaviour, ITickable
     {
-        private const float LifePunishmentSpeed = 0.1f;
-        private const float LifeRecoverySpeed = 0.08f;
+        public GameObject plantPrefab;
 
         [Tooltip("The total number of cycles the plant needs to reach maturity")]
         public int growCyclesTillSeed = 20;
@@ -15,10 +14,15 @@ namespace mechanics
         [Tooltip("The total number of cycles the plant needs before it starts to grow")]
         public int germinationCycles = 5;
 
+        private const float LifePunishmentSpeed = 0.1f;
+        private const float LifeRecoverySpeed = 0.08f;
+
+        private PlantBranch _plantBranch;
         private Nutrient[] _nutrients;
         private int _currentGrowth;
         private int _currentHealth;
         private float _life;
+        private bool hasGerminated;
 
         /// <summary>
         /// The health of the plant. When this is 0 the plant wil not grow anymore. Mapped between (0,1)
@@ -39,15 +43,24 @@ namespace mechanics
         /// </summary>
         public void Tick()
         {
-            if (IsDead) return;
+            if (!isActiveAndEnabled) return; 
+            
+            if (IsDead)
+            {
+                if (_plantBranch != null) _plantBranch.IsGrowing = false;
+                return;
+            };
             
             _currentGrowth++;
             
             NutrientCheck();
 
-            if (_currentGrowth >= germinationCycles)
+            if (_currentGrowth >= germinationCycles && !hasGerminated)
             {
-                // TODO: Start grow visuals
+                var go = Instantiate(plantPrefab, transform);
+                _plantBranch = go.GetComponent<PlantBranch>();
+                _plantBranch.IsGrowing = true;
+                hasGerminated = true;
             }
 
             if (_currentGrowth >= growCyclesTillSeed)

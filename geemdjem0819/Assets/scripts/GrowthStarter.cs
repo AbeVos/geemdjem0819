@@ -19,9 +19,10 @@ public class GrowthStarter : MonoBehaviour
 
     private void MakeUndraggable()
     {
+        _growController.enabled = true;
         _draggable.enabled = false;
         _rigidBody.isKinematic = true;
-        _growController.gameObject.SetActive(true);
+        Destroy(this);
     }
 
     private void OnTriggerStay(Collider other)
