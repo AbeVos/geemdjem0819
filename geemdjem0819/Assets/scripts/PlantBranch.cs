@@ -20,6 +20,7 @@ public class PlantBranch : MonoBehaviour
     private Quaternion growDirection;
 
     private bool isGrowing = true;
+    public bool IsGrowing { get; set; }
 
     private MeshFilter meshFilter;
 
@@ -85,11 +86,11 @@ public class PlantBranch : MonoBehaviour
         }
 
         if (isGrowing) {
-            UpdateBranch();
+            TickBranch();
         }
     }
 
-    private void UpdateBranch() {
+    public void TickBranch() {
         growBase.rotation = Quaternion.RotateTowards(
             growBase.rotation, growDirection, Mathf.PI * turnSpeed * Time.deltaTime
         ) * Random.rotation.Pow(Time.deltaTime * directionVariance);
