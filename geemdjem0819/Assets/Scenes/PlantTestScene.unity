@@ -205,7 +205,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 208634662}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.7, y: 13.4, z: 25.3}
+  m_LocalPosition: {x: 9.7, y: 115.7, z: 66.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -334,11 +334,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nVertices: 12
+  branchRadius: 1
+  startRadius: 1
+  tipFalloff: 15
   segmentLength: 1
   growSpeed: 10
   turnSpeed: 20
   directionVariance: 5
   growTarget: {fileID: 208634664}
+  leaf: {fileID: 6954913047580166929, guid: dc08f595617d61240a47f0d3f9e3086e, type: 3}
+  leafSize: 1
 --- !u!4 &1213970900
 Transform:
   m_ObjectHideFlags: 0
@@ -476,7 +481,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2141414706}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 0, y: 23.89, z: -85.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

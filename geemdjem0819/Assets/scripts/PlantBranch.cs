@@ -17,7 +17,9 @@ public struct Ring
         rotation = transform.rotation;
         scale = transform.localScale;
 
-        for (int i = 0; i < nVertices; i++) {
+        // Generate vertices in a circle.
+        for (int i = 0; i < nVertices; i++)
+        {
             var t = 2 * Mathf.PI * i / nVertices;
 
             var x = radius * Mathf.Cos(t);
@@ -32,7 +34,8 @@ public struct Ring
     /// Retrieve transformed vertices from this Ring.
     public List<Vector3> Vertices
     {
-        get {
+        get
+        {
             var matrix = Matrix4x4.TRS(position, rotation, scale);
 
             var transformedVertices = new List<Vector3>();
@@ -44,6 +47,14 @@ public struct Ring
             return transformedVertices;
         }
         private set { vertices = value; }
+    }
+
+    public Matrix4x4 TRS
+    {
+        get
+        {
+            return Matrix4x4.TRS(position, rotation, scale);
+        }
     }
 }
 
@@ -64,19 +75,22 @@ public class PlantBranch : MonoBehaviour
 
     public Transform growTarget;
 
+    public GameObject leaf;
+
+    public float leafSize = 1f;
+
     // Global direction of growth.
     private Transform growBase;
     // Last position (local) where a branch segment has been spawned.
     private Vector3 lastPosition;
     private Quaternion growDirection;
 
-    private bool isGrowing = true;
     public bool IsGrowing { get; set; }
 
     private MeshFilter meshFilter;
 
-    private List<Transform> branchSegments;
     private List<Ring> branchRings;
+    private List<GameObject> leafs;
 
     protected void Start() {
         growBase = new GameObject().transform;
@@ -84,11 +98,13 @@ public class PlantBranch : MonoBehaviour
         lastPosition = growBase.position;
         growDirection = new Quaternion();
 
-        branchSegments = new List<Transform>();
         branchRings = new List<Ring>();
+        leafs = new List<GameObject>();
         branchRings.Add(new Ring(growBase, startRadius, nVertices));
 
         meshFilter = GetComponent<MeshFilter>();
+
+        IsGrowing = true;
     }
 
     protected void Update()
@@ -100,9 +116,14 @@ public class PlantBranch : MonoBehaviour
             growDirection = YLookRotation(direction.normalized, Vector3.up);
         }
 
-        if (isGrowing)
+        if (IsGrowing)
         {
             TickBranch();
+        }
+
+        foreach (GameObject leaf in leafs)
+        {
+            leaf.transform.rotation *= Random.rotation.Pow(Time.deltaTime * directionVariance);
         }
     }
 
@@ -127,7 +148,24 @@ public class PlantBranch : MonoBehaviour
 
             branchRings.Add(new Ring(growBase, startRadius, nVertices));
             GenerateMesh();
+
+            if (Random.value < 0.1)
+            {
+                CreateLeaf(growBase);
+            }
         }
+    }
+
+    /// Instantiate a new leaf and store it.
+    public GameObject CreateLeaf(Transform transform)
+    {
+        var go = Instantiate(leaf, transform.position, transform.rotation);
+        go.transform.localScale = Vector3.zero;
+        go.transform.parent = this.transform;
+
+        leafs.Add(go);
+
+        return go;
     }
 
     /// Update the MeshFilter's mesh using the branchRings' vertices.
