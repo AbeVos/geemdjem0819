@@ -89,47 +89,6 @@ public class PlantBranch : MonoBehaviour
         branchRings.Add(new Ring(growBase, startRadius, nVertices));
 
         meshFilter = GetComponent<MeshFilter>();
-        
-        /*
-        var mesh = new Mesh();
-        meshFilter.mesh = mesh;
-
-        var vertices = new Vector3[4]
-        {
-            new Vector3(0, 0, 0),
-            new Vector3(width, 0, 0),
-            new Vector3(0, height, 0),
-            new Vector3(width, height, 0)
-        };
-        mesh.vertices = vertices;
-
-        var tris = new int[6]
-        {
-            // lower left triangle
-            0, 2, 1,
-            // upper right triangle
-            2, 3, 1
-        };
-        mesh.triangles = tris;
-
-        var normals = new Vector3[4]
-        {
-            -Vector3.forward,
-            -Vector3.forward,
-            -Vector3.forward,
-            -Vector3.forward
-        };
-        mesh.normals = normals;
-
-        var uv = new Vector2[4]
-        {
-            new Vector2(0, 0),
-            new Vector2(1, 0),
-            new Vector2(0, 1),
-            new Vector2(1, 1)
-        };
-        mesh.uv = uv;
-        */
     }
 
     protected void Update()
@@ -176,11 +135,6 @@ public class PlantBranch : MonoBehaviour
     {
         var vertexList = new List<Vector3>();
 
-        // foreach (Ring ring in branchRings)
-        // {
-            // vertexList.AddRange(ring.Vertices);
-        // }
-
         for (var i = 0; i < branchRings.Count; i++)
         {
             var ring = branchRings[i];
@@ -191,9 +145,7 @@ public class PlantBranch : MonoBehaviour
             vertexList.AddRange(ring.Vertices);
         }
 
-        var vertexArray = vertexList.ToArray();
-
-        meshFilter.mesh.vertices = vertexArray;
+        meshFilter.mesh.vertices = vertexList.ToArray();
 
         var numRings = branchRings.Count;
         var numQuads = (numRings - 1) * nVertices;
@@ -205,24 +157,20 @@ public class PlantBranch : MonoBehaviour
             tris[3*i] = i;
             tris[3*i+1] = i + nVertices;
             tris[3*i+2] = RingModulo(i, nVertices);
-        }
 
-        for (var i = 0; i < numQuads; i++)
-        {
             tris[3*i + 3 * numQuads] = RingModulo(i, nVertices);
             tris[3*i + 3 * numQuads+1] = i + nVertices;
             tris[3*i + 3 * numQuads+2] = RingModulo(i, nVertices) + nVertices;
         }
 
         meshFilter.mesh.triangles = tris;
-
         meshFilter.mesh.RecalculateNormals();
     }
 
     private Quaternion YLookRotation(Vector3 right, Vector3 up)
     {
-        Quaternion upToForward = Quaternion.Euler(90f, 0f, 0f);
-        Quaternion forwardToTarget = Quaternion.LookRotation(right, up);
+        var upToForward = Quaternion.Euler(90f, 0f, 0f);
+        var forwardToTarget = Quaternion.LookRotation(right, up);
 
         return forwardToTarget * upToForward;
     }
