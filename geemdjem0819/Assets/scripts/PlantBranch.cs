@@ -52,6 +52,10 @@ public class PlantBranch : MonoBehaviour
 {
     public int nVertices = 8;
 
+    public float branchRadius = 1f;
+    public float startRadius = 1f;
+    public float tipFalloff = 5f;
+
     public float segmentLength = 1f;
     public float growSpeed = 1f;
     public float turnSpeed = 3f;
@@ -82,7 +86,7 @@ public class PlantBranch : MonoBehaviour
 
         branchSegments = new List<Transform>();
         branchRings = new List<Ring>();
-        branchRings.Add(new Ring(growBase, 1f, nVertices));
+        branchRings.Add(new Ring(growBase, startRadius, nVertices));
 
         meshFilter = GetComponent<MeshFilter>();
         
@@ -162,7 +166,7 @@ public class PlantBranch : MonoBehaviour
         {
             lastPosition = position;
 
-            branchRings.Add(new Ring(growBase, 1f, nVertices));
+            branchRings.Add(new Ring(growBase, startRadius, nVertices));
             GenerateMesh();
         }
     }
@@ -172,8 +176,18 @@ public class PlantBranch : MonoBehaviour
     {
         var vertexList = new List<Vector3>();
 
-        foreach (Ring ring in branchRings)
+        // foreach (Ring ring in branchRings)
+        // {
+            // vertexList.AddRange(ring.Vertices);
+        // }
+
+        for (var i = 0; i < branchRings.Count; i++)
         {
+            var ring = branchRings[i];
+            var iInv = branchRings.Count - i;
+
+            ring.scale = branchRadius * Vector3.one * (1 - Mathf.Exp(-1 / tipFalloff * iInv));
+
             vertexList.AddRange(ring.Vertices);
         }
 
