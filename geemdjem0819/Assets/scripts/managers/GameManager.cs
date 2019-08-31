@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using interfaces;
 using UnityEngine;
 
@@ -13,18 +14,23 @@ namespace managers
         /// </summary>
         public int tickRate = 1;
 
-        private bool isTicking;
+        private bool isTicking = true;
 
-         private List<ITickable> Tickables { get; set; }
+        public GameObject[] ObjectsToCheck;
+        private ITickable[] Tickables;
 
         private void Awake()
         {
+            Tickables = ObjectsToCheck.Select(objects => objects.GetComponent<ITickable>()).Where(obj => obj != null)
+                .ToArray();
+
             StartCoroutine(TickClock());
         }
 
 
         IEnumerator TickClock()
         {
+            //Debug.Log("TICK");
             foreach (var tickable in Tickables)
             {
                 tickable.Tick();
