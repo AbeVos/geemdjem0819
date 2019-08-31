@@ -2,6 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct Ring {
+    private List<Vector3> vertices;
+
+    public Vector3 position;
+    public Quaternion rotation;
+    public Vector3 scale;
+
+    public Ring(Transform transform, float radius, int n_vertices) {
+        vertices = new List<Vector3>();
+        position = transform.position;
+        rotation = transform.rotation;
+        scale = transform.localScale;
+
+        for (int i = 0; i < n_vertices; i++) {
+            var t = 2 * Mathf.PI * i / n_vertices;
+
+            var x = radius * Mathf.Cos(t);
+            var z = radius * Mathf.Sin(t);
+
+            var vertex = new Vector3(x, 0, z);
+
+            vertices.Add(vertex);
+        }
+    }
+}
+
 [RequireComponent(typeof(MeshFilter))]
 public class PlantBranch : MonoBehaviour
 {
@@ -25,7 +51,7 @@ public class PlantBranch : MonoBehaviour
     private MeshFilter meshFilter;
 
     private List<Transform> branchSegments;
-    
+
     protected void Start() {
         growBase = new GameObject().transform;
         growBase.parent = transform;
@@ -126,9 +152,12 @@ public class PlantBranch : MonoBehaviour
         var vertices = new List<Vector3>();
 
         for (int i=0; i<n_vertices; i++) {
-            var t = i / n_vertices;
+            var t = 2 * Mathf.PI * i / n_vertices;
 
-            var vertex = new Vector3(0, 0, 0);
+            var x = radius * Mathf.Cos(t);
+            var z = radius * Mathf.Sin(t);
+
+            var vertex = new Vector3(x, 0, z);
 
             vertices.Add(vertex);
         }
