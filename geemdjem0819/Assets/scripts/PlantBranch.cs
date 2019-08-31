@@ -188,7 +188,9 @@ public class PlantBranch : MonoBehaviour
     /// Instantiate a new leaf and store it.
     public Leaf AddLeaf()
     {
-        var leafObject = Instantiate(leafPrefab, growBase.position, growBase.rotation);
+        var rotation = Quaternion.FromToRotation(Vector3.up, growBase.forward);
+        rotation.eulerAngles = growBase.forward * 360 * Random.value;
+        var leafObject = Instantiate(leafPrefab, growBase.position, rotation);
         leafObject.transform.localScale = Vector3.zero;
         leafObject.transform.parent = this.transform;
 

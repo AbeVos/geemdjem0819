@@ -340,12 +340,12 @@ MonoBehaviour:
   segmentLength: 1
   growSpeed: 10
   turnSpeed: 20
-  directionVariance: 5
+  directionVariance: 3
   growTarget: {fileID: 208634664}
   leafPrefab: {fileID: 6954913047580166929, guid: dc08f595617d61240a47f0d3f9e3086e,
     type: 3}
   leafSize: 10
-  leafDensity: 0.2
+  leafDensity: 0.1
 --- !u!4 &1213970900
 Transform:
   m_ObjectHideFlags: 0
