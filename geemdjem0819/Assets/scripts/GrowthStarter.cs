@@ -4,13 +4,13 @@
 public class GrowthStarter : MonoBehaviour
 {
     public float germinationTime = 5f;
-    public Draggable draggable;
-    public Rigidbody rigidBody;
+    private Draggable _draggable;
+    private Rigidbody _rigidBody;
 
     private void Start()
     {
-        draggable = gameObject.GetComponent<Draggable>();
-        rigidBody = gameObject.GetComponent<Rigidbody>();
+        _draggable = gameObject.GetComponent<Draggable>();
+        _rigidBody = gameObject.GetComponent<Rigidbody>();
     }
 
     private void Update()
@@ -23,8 +23,8 @@ public class GrowthStarter : MonoBehaviour
 
     private void MakeUndraggable()
     {
-        Destroy(draggable);
-        rigidBody.isKinematic = true;
+        Destroy(_draggable);
+        _rigidBody.isKinematic = true;
         Destroy(this);
     }
 
