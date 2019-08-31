@@ -1,20 +1,41 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class DayNightSlider : MonoBehaviour
 {
-    public float timeOfDay;
-    public int directionalLightMinX;
-    public int directionalLightMaxX;
     public Light directionalLight;
+    public Slider slider;
 
-    // The target marker.
-    public Transform target;
+    public Vector3 target;
 
-    // Angular speed in radians per sec.
-    float speed= 0.5f;
+    private float previousValue;
+    private float speed = 1f;
+
+    private void Awake()
+    {
+        slider = GetComponent<Slider>();
+        slider.onValueChanged.AddListener(OnSliderChanged);
+    }
 
     void Update()
     {
-        directionalLight.transform.LookAt(target);
+        UpdateLight();
+    }
+    void OnSliderChanged(float value)
+    {
+        target = new Vector3
+        {
+            x = directionalLight.transform.position.x + 1,
+            y = directionalLight.transform.position.y - 1,
+            z = (value - 0.5f) * 2
+        };
+    }
+
+    void UpdateLight()
+    {
+        float step = speed * Time.deltaTime;
+
+        Quaternion rotation = Quaternion.LookRotation(target, Vector3.up);
+        directionalLight.transform.rotation = Quaternion.Slerp(directionalLight.transform.rotation, rotation, step);
     }
 }
