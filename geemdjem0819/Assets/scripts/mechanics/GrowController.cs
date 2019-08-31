@@ -1,5 +1,4 @@
-﻿using System;
-using interfaces;
+﻿using interfaces;
 using UnityEngine;
 
 namespace mechanics
@@ -12,16 +11,19 @@ namespace mechanics
         [Tooltip("The total number of cycles the plant needs before it starts to grow")]
         public int germinationCycles = 5;
 
-        //public GameManager Manager;
-
         private Nutrient[] _nutrients;
         private int _currentGrowth;
         private int _currentHealth;
+        private float _life;
 
         /// <summary>
         /// The health of the plant. When this is 0 the plant wil not grow anymore. Mapped between (0,1)
         /// </summary>
-        public float Life { get; private set; }
+        public float Life
+        {
+            get => Mathf.Clamp01(_life);
+            private set => _life = value;
+        }
 
         /// <summary>
         /// Returns true when Life is 0.
@@ -33,23 +35,20 @@ namespace mechanics
         /// </summary>
         public void Tick()
         {
-            if (IsDead)
-            {
-                Debug.Log("Ded");
-                return;
-            }
-
-            _currentGrowth++;
+            if (IsDead) return;
             
+            _currentGrowth++;
+
             const int demand = 1;
             foreach (var nutrient in _nutrients)
             {
                 if (demand != nutrient.Consume(demand))
                 {
                     Life -= 0.1f;
+                    //Debug.Log("AAAAAH IK HEB HONGER OF DORST OF WAT PLANTEN DAN OOK HEBBEN!!!! ");
                 }
             }
-            
+
             if (_currentGrowth >= germinationCycles)
             {
                 // TODO: Start grow visuals
