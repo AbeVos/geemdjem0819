@@ -4,7 +4,7 @@ public class Draggable : MonoBehaviour, IDraggable
 {
     public bool isDraggable { get; set; }
 
-    protected void Start()
+    protected void Awake()
     {
         isDraggable = true;
     }

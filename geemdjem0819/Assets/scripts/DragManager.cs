@@ -4,31 +4,29 @@ public class DragManager : MonoBehaviour
 {
     public float catchingDistance = 3f;
     public GameObject draggingObject;
-    private bool isDragging { get; set; }
+    private bool isDraggingAnObject { get; set; }
 
     protected void Start()
     {
-        isDragging = false;
+        isDraggingAnObject = false;
     }
 
     protected void Update()
     {
         if (Input.GetMouseButton(0))
         {
-            if (!isDragging)
+            if (!isDraggingAnObject)
             {
                 draggingObject = GetObjectFromMouseRaycast();
-                if (draggingObject
-                    && draggingObject.GetComponent<IDraggable>() != null
-                    && draggingObject.GetComponent<IDraggable>().isDraggable == true)
+                if (draggingObject && draggingObject?.GetComponent<IDraggable>().isDraggable == true)
                 {
                     draggingObject.GetComponent<Rigidbody>().isKinematic = true;
-                    isDragging = true;
+                    isDraggingAnObject = true;
                 }
             }
             else if (draggingObject != null)
             {
-                draggingObject.GetComponent<Rigidbody>().MovePosition(CalculateMouse3DVector());
+                draggingObject.GetComponent<Rigidbody>().MovePosition(GetMouseWorldSpacePosition());
             }
         }
         else
@@ -37,7 +35,7 @@ public class DragManager : MonoBehaviour
             {
                 draggingObject.GetComponent<Rigidbody>().isKinematic = false;
             }
-            isDragging = false;
+            isDraggingAnObject = false;
         }
     }
 
@@ -56,12 +54,11 @@ public class DragManager : MonoBehaviour
         }
         return gameObject;
     }
-    public Vector3 CalculateMouse3DVector()
+    public Vector3 GetMouseWorldSpacePosition()
     {
-        Vector3 v3 = Input.mousePosition;
-        v3.z = catchingDistance;
-        v3 = Camera.main.ScreenToWorldPoint(v3);
-        //Debug.Log(v3); //Current Position of mouse in world space
-        return v3;
+        Vector3 mouseWorldPosition = Input.mousePosition;
+        mouseWorldPosition.z = catchingDistance;
+        mouseWorldPosition = Camera.main.ScreenToWorldPoint(mouseWorldPosition);
+        return mouseWorldPosition;
     }
 }
