@@ -6,6 +6,9 @@ namespace mechanics
 {
     public class GrowController : MonoBehaviour, ITickable
     {
+        private const float LifePunishmentSpeed = 0.1f;
+        private const float LifeRecoverySpeed = 0.08f;
+
         [Tooltip("The total number of cycles the plant needs to reach maturity")]
         public int growCyclesTillSeed = 20;
 
@@ -39,16 +42,8 @@ namespace mechanics
             if (IsDead) return;
             
             _currentGrowth++;
-
-            const int demand = 1;
-            foreach (var nutrient in _nutrients)
-            {
-                if (demand != nutrient.Consume(demand))
-                {
-                    Life -= 0.1f;
-                    //Debug.Log("AAAAAH IK HEB HONGER OF DORST OF WAT PLANTEN DAN OOK HEBBEN!!!! ");
-                }
-            }
+            
+            NutrientCheck();
 
             if (_currentGrowth >= germinationCycles)
             {
@@ -58,6 +53,22 @@ namespace mechanics
             if (_currentGrowth >= growCyclesTillSeed)
             {
                 // TODO: SEEDS
+            }
+        }
+
+        private void NutrientCheck()
+        {
+            const int demand = 1;
+            foreach (var nutrient in _nutrients)
+            {
+                if (demand != nutrient.Consume(demand))
+                {
+                    Life -= LifePunishmentSpeed;
+                }
+                else
+                {
+                    Life += LifeRecoverySpeed;
+                }
             }
         }
 
