@@ -58,6 +58,22 @@ public struct Ring
     }
 }
 
+public struct Leaf
+{
+    public GameObject leafObject;
+    public float timeAlive;
+
+    public Leaf (GameObject leafObject, float timeAlive)
+    {
+        this.leafObject = leafObject;
+        this.timeAlive = timeAlive;
+    }
+
+    public Transform transform {
+        get { return leafObject.transform; }
+    }
+}
+
 [RequireComponent(typeof(MeshFilter))]
 public class PlantBranch : MonoBehaviour
 {
@@ -65,7 +81,7 @@ public class PlantBranch : MonoBehaviour
 
     public float branchRadius = 1f;
     public float startRadius = 1f;
-    public float tipFalloff = 5f;
+    public float growthFalloff = 5f;
 
     public float segmentLength = 1f;
     public float growSpeed = 1f;
@@ -75,9 +91,10 @@ public class PlantBranch : MonoBehaviour
 
     public Transform growTarget;
 
-    public GameObject leaf;
+    public GameObject leafPrefab;
 
     public float leafSize = 1f;
+    public float leafDensity = 1f;
 
     // Global direction of growth.
     private Transform growBase;
@@ -90,7 +107,7 @@ public class PlantBranch : MonoBehaviour
     private MeshFilter meshFilter;
 
     private List<Ring> branchRings;
-    private List<GameObject> leafs;
+    private List<Leaf> leafs;
 
     protected void Start() {
         growBase = new GameObject().transform;
@@ -99,7 +116,7 @@ public class PlantBranch : MonoBehaviour
         growDirection = new Quaternion();
 
         branchRings = new List<Ring>();
-        leafs = new List<GameObject>();
+        leafs = new List<Leaf>();
         branchRings.Add(new Ring(growBase, startRadius, nVertices));
 
         meshFilter = GetComponent<MeshFilter>();
@@ -121,10 +138,7 @@ public class PlantBranch : MonoBehaviour
             TickBranch();
         }
 
-        foreach (GameObject leaf in leafs)
-        {
-            leaf.transform.rotation *= Random.rotation.Pow(Time.deltaTime * directionVariance);
-        }
+        TickLeafs();
     }
 
     /// Update the branch growing.
@@ -149,23 +163,40 @@ public class PlantBranch : MonoBehaviour
             branchRings.Add(new Ring(growBase, startRadius, nVertices));
             GenerateMesh();
 
-            if (Random.value < 0.1)
+            if (Random.value < leafDensity)
             {
-                CreateLeaf(growBase);
+                AddLeaf();
             }
         }
     }
 
-    /// Instantiate a new leaf and store it.
-    public GameObject CreateLeaf(Transform transform)
+    private void TickLeafs()
     {
-        var go = Instantiate(leaf, transform.position, transform.rotation);
-        go.transform.localScale = Vector3.zero;
-        go.transform.parent = this.transform;
+        for (int i = 0; i < leafs.Count; i++)
+        {
+            var leaf = leafs[i];
+            var timeAlive = leaf.timeAlive + Time.deltaTime;
 
-        leafs.Add(go);
+            // leaf.transform.rotation *= Random.rotation.Pow(Time.deltaTime * directionVariance);
 
-        return go;
+            leaf.transform.localScale = leafSize * (1f - Mathf.Exp(-timeAlive / growthFalloff)) * Vector3.one;
+
+            leafs[i] = new Leaf(leaf.leafObject, timeAlive);
+        }
+    }
+
+    /// Instantiate a new leaf and store it.
+    public Leaf AddLeaf()
+    {
+        var leafObject = Instantiate(leafPrefab, growBase.position, growBase.rotation);
+        leafObject.transform.localScale = Vector3.zero;
+        leafObject.transform.parent = this.transform;
+
+        var leaf = new Leaf(leafObject, 0f);
+
+        leafs.Add(leaf);
+
+        return leaf;
     }
 
     /// Update the MeshFilter's mesh using the branchRings' vertices.
@@ -178,7 +209,7 @@ public class PlantBranch : MonoBehaviour
             var ring = branchRings[i];
             var iInv = branchRings.Count - i;
 
-            ring.scale = branchRadius * Vector3.one * (1 - Mathf.Exp(-1 / tipFalloff * iInv));
+            ring.scale = branchRadius * Vector3.one * (1 - Mathf.Exp(-1 / growthFalloff * iInv));
 
             vertexList.AddRange(ring.Vertices);
         }
