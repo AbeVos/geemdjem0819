@@ -184,13 +184,20 @@ public class PlantBranch : MonoBehaviour
         var numRings = branchRings.Count;
         var numQuads = (numRings - 1) * nVertices;
 
-        var tris = new int[3 * numQuads];
+        var tris = new int[6 * numQuads];
 
         for (var i = 0; i < numQuads; i++)
         {
             tris[3*i] = i;
             tris[3*i+1] = i + nVertices;
-            tris[3*i+2] = ((i + 1) % nVertices) + (i - (i % nVertices));
+            tris[3*i+2] = RingModulo(i, nVertices);
+        }
+
+        for (var i = 0; i < numQuads; i++)
+        {
+            tris[3*i + 3 * numQuads] = RingModulo(i, nVertices);
+            tris[3*i + 3 * numQuads+1] = i + nVertices;
+            tris[3*i + 3 * numQuads+2] = RingModulo(i, nVertices) + nVertices;
         }
 
         meshFilter.mesh.triangles = tris;
@@ -204,5 +211,12 @@ public class PlantBranch : MonoBehaviour
         Quaternion forwardToTarget = Quaternion.LookRotation(right, up);
 
         return forwardToTarget * upToForward;
+    }
+
+    /// Get the vertex index corresponding to the vertex on the next
+    /// position on the Ring.
+    private int RingModulo(int i, int nVertices)
+    {
+        return ((i + 1) % nVertices) + (i - (i % nVertices));
     }
 }
