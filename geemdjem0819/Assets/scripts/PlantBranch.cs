@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(MeshFilter))]
 public class PlantBranch : MonoBehaviour
 {
     public float segmentLength = 1f;
     public float growSpeed = 1f;
     public float turnSpeed = 3f;
+
+    public float directionVariance = 1f;
 
     public Transform growTarget;
 
@@ -78,9 +81,7 @@ public class PlantBranch : MonoBehaviour
         var direction = growTarget.position - growBase.position;
 
         if (direction.magnitude > 0f) {
-            growDirection = YLookRotation(
-                direction.normalized, Vector3.up
-            );
+            growDirection = YLookRotation(direction.normalized, Vector3.up);
         }
 
         if (isGrowing) {
@@ -90,8 +91,8 @@ public class PlantBranch : MonoBehaviour
 
     private void UpdateBranch() {
         growBase.rotation = Quaternion.RotateTowards(
-            growBase.rotation, growDirection, turnSpeed * Time.deltaTime
-        );
+            growBase.rotation, growDirection, Mathf.PI * turnSpeed * Time.deltaTime
+        ) * Random.rotation.Pow(Time.deltaTime * directionVariance);
         var position = growBase.position;
         position += Time.deltaTime * growSpeed * growBase.up;
 
@@ -134,10 +135,10 @@ public class PlantBranch : MonoBehaviour
         return vertices;
     }
 
-Quaternion YLookRotation(Vector3 right, Vector3 up) {
-    Quaternion upToForward = Quaternion.Euler(90f, 0f, 0f);
-    Quaternion forwardToTarget = Quaternion.LookRotation(right, up);
+    private Quaternion YLookRotation(Vector3 right, Vector3 up) {
+        Quaternion upToForward = Quaternion.Euler(90f, 0f, 0f);
+        Quaternion forwardToTarget = Quaternion.LookRotation(right, up);
 
-    return forwardToTarget * upToForward;
-}
+        return forwardToTarget * upToForward;
+    }
 }
