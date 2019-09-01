@@ -7,18 +7,22 @@ public struct Ring
 {
     private List<Vector3> vertices;
 
-    public Vector3 _position;
+    private Vector3 _position;
     public Quaternion rotation;
     public Vector3 scale;
 
+    private Transform parent;
+
     private List<Transform> children;
 
-    public Ring(Transform transform, float radius, int nVertices)
+    public Ring(Transform transform, float radius, int nVertices, Transform parent)
     {
         vertices = new List<Vector3>();
-        _position = transform.position;
-        rotation = transform.rotation;
+        _position = transform.localPosition;
+        rotation = transform.localRotation;
         scale = transform.localScale;
+
+        this.parent = parent;
 
         children = new List<Transform>();
 
@@ -27,8 +31,11 @@ public struct Ring
         {
             var t = 2 * Mathf.PI * i / nVertices;
 
-            var x = radius * Mathf.Cos(t);
-            var z = radius * Mathf.Sin(t);
+            // var x = radius * Mathf.Cos(t);
+            // var z = radius * Mathf.Sin(t);
+            var variance = (1 + 0.2f * Mathf.Cos(2 * Mathf.PI * nVertices * t));
+            var x = variance * radius * Mathf.Cos(t);
+            var z = variance * radius * Mathf.Sin(t);
 
             var vertex = new Vector3(x, 0, z);
 
@@ -48,7 +55,7 @@ public struct Ring
 
             foreach (Transform child in children)
             {
-                child.position = value;
+                child.position = value + parent.position;
             }
         }
     }
@@ -125,13 +132,14 @@ public class PlantBranch : MonoBehaviour, ITickable
 
     protected void Start() {
         growBase = new GameObject().transform;
+        growBase.position = transform.position;
         growBase.parent = transform;
         lastPosition = growBase.position;
         growDirection = new Quaternion();
 
         branchRings = new List<Ring>();
         leafs = new List<Leaf>();
-        branchRings.Add(new Ring(growBase, startRadius, nVertices));
+        branchRings.Add(new Ring(growBase, startRadius, nVertices, transform));
 
         meshFilter = GetComponent<MeshFilter>();
         
@@ -195,7 +203,7 @@ public class PlantBranch : MonoBehaviour, ITickable
                 leaf = AddLeaf();
             }
 
-            var ring = new Ring(growBase, startRadius, nVertices);
+            var ring = new Ring(growBase, startRadius, nVertices, transform);
 
             if (leaf != null)
             {
@@ -213,6 +221,11 @@ public class PlantBranch : MonoBehaviour, ITickable
     /// Instantiate a new leaf and store it.
     public Leaf AddLeaf()
     {
+        if (leafPrefabs.Length == 0)
+        {
+            return null;
+        }
+
         var leafIndex = Random.Range(0, leafPrefabs.Length);
         var prefab = leafPrefabs[leafIndex];
 
