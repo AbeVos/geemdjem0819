@@ -11,7 +11,7 @@ public struct Ring
     public Quaternion rotation;
     public Vector3 scale;
 
-    public Leaf leaf;
+    private List<Transform> children;
 
     public Ring(Transform transform, float radius, int nVertices)
     {
@@ -20,7 +20,7 @@ public struct Ring
         rotation = transform.rotation;
         scale = transform.localScale;
 
-        leaf = null;
+        children = new List<Transform>();
 
         // Generate vertices in a circle.
         for (int i = 0; i < nVertices; i++)
@@ -36,14 +36,19 @@ public struct Ring
         }
     }
 
+    public void Add(Transform child)
+    {
+        children.Add(child);
+    }
+
     public Vector3 position {
         get { return _position; }
         set {
             _position = value;
 
-            if (leaf !=null)
+            foreach (Transform child in children)
             {
-                leaf.transform.position = value;
+                child.position = value;
             }
         }
     }
@@ -194,7 +199,8 @@ public class PlantBranch : MonoBehaviour, ITickable
 
             if (leaf != null)
             {
-                ring.leaf = leaf;
+                // ring.leaf = leaf;
+                ring.Add(leaf.transform);
             }
 
             branchRings.Add(ring);
@@ -228,7 +234,8 @@ public class PlantBranch : MonoBehaviour, ITickable
     public GameObject GrowFlower()
     {
         var flowerObject = Instantiate(flowerPrefab, growBase);
-        flowerObject.transform.parent = growBase;
+
+        branchRings[branchRings.Count - 1].Add(flowerObject.transform);
 
         return flowerObject;
     }
