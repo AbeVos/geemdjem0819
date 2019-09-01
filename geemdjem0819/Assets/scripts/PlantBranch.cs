@@ -58,22 +58,6 @@ public struct Ring
     }
 }
 
-public struct Leaf
-{
-    public GameObject leafObject;
-    public float timeAlive;
-
-    public Leaf (GameObject leafObject, float timeAlive)
-    {
-        this.leafObject = leafObject;
-        this.timeAlive = timeAlive;
-    }
-
-    public Transform transform {
-        get { return leafObject.transform; }
-    }
-}
-
 [RequireComponent(typeof(MeshFilter))]
 public class PlantBranch : MonoBehaviour
 {
@@ -91,7 +75,7 @@ public class PlantBranch : MonoBehaviour
 
     public Transform growTarget;
 
-    public GameObject leafPrefab;
+    public GameObject[] leafPrefabs;
 
     public float leafSize = 1f;
     public float leafDensity = 1f;
@@ -138,7 +122,7 @@ public class PlantBranch : MonoBehaviour
             TickBranch();
         }
 
-        TickLeafs();
+        // TickLeafs();
     }
 
     /// Update the branch growing.
@@ -170,31 +154,21 @@ public class PlantBranch : MonoBehaviour
         }
     }
 
-    private void TickLeafs()
-    {
-        for (int i = 0; i < leafs.Count; i++)
-        {
-            var leaf = leafs[i];
-            var timeAlive = leaf.timeAlive + Time.deltaTime;
-
-            // leaf.transform.rotation *= Random.rotation.Pow(Time.deltaTime * directionVariance);
-
-            leaf.transform.localScale = leafSize * (1f - Mathf.Exp(-timeAlive / growthFalloff)) * Vector3.one;
-
-            leafs[i] = new Leaf(leaf.leafObject, timeAlive);
-        }
-    }
-
     /// Instantiate a new leaf and store it.
     public Leaf AddLeaf()
     {
-        var rotation = Quaternion.FromToRotation(Vector3.up, growBase.forward);
-        rotation.eulerAngles = growBase.forward * 360 * Random.value;
-        var leafObject = Instantiate(leafPrefab, growBase.position, rotation);
+        var leafIndex = Random.Range(0, leafPrefabs.Length);
+        var prefab = leafPrefabs[leafIndex];
+
+        // var rotation = Quaternion.FromToRotation(Vector3.up, growBase.forward);
+        var leafObject = Instantiate(prefab, growBase.position, Quaternion.identity);
+        leafObject.transform.eulerAngles += Vector3.up * 360 * Random.value;
+        leafObject.transform.localEulerAngles += Vector3.right * 60 * (Random.value - 0.5f);
+
         leafObject.transform.localScale = Vector3.zero;
         leafObject.transform.parent = this.transform;
 
-        var leaf = new Leaf(leafObject, 0f);
+        var leaf = leafObject.GetComponent<Leaf>();
 
         leafs.Add(leaf);
 

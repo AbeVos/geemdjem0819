@@ -334,16 +334,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nVertices: 12
-  branchRadius: 1
+  branchRadius: 0.5
   startRadius: 1
   growthFalloff: 15
   segmentLength: 1
   growSpeed: 10
   turnSpeed: 20
-  directionVariance: 3
+  directionVariance: 4
   growTarget: {fileID: 208634664}
-  leafPrefab: {fileID: 6954913047580166929, guid: dc08f595617d61240a47f0d3f9e3086e,
-    type: 3}
+  leafPrefabs:
+  - {fileID: 6954913047580166929, guid: dc08f595617d61240a47f0d3f9e3086e, type: 3}
   leafSize: 10
   leafDensity: 0.1
 --- !u!4 &1213970900
