@@ -44,8 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2e0bbacaa2784b4eb1eccd16d93da2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meanSize: 10
-  stdSize: 2
+  meanSize: 1
+  stdSize: 0.5
   growthFalloff: 15
 --- !u!1001 &7090838129065784767
 PrefabInstance:
@@ -117,23 +117,23 @@ PrefabInstance:
     - target: {fileID: -4216859302048453862, guid: a78be4ce38dd4c4448d7d16df4850bc0,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: a78be4ce38dd4c4448d7d16df4850bc0,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: a78be4ce38dd4c4448d7d16df4850bc0,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -1504981713932161579, guid: a78be4ce38dd4c4448d7d16df4850bc0,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 6d44ce5d83b1b364c9bef8e6516adb73, type: 2}
+      objectReference: {fileID: 2100000, guid: af3a4590c8d6ec246a69014f32ebd8d2, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a78be4ce38dd4c4448d7d16df4850bc0, type: 3}
 --- !u!4 &2818412769212849829 stripped
