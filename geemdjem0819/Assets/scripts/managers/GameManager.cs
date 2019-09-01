@@ -21,8 +21,13 @@ namespace managers
 
         private void Awake()
         {
-            Tickables = ObjectsToCheck.Select(objects => objects.GetComponent<ITickable>()).Where(obj => obj != null)
-                .ToArray();
+            var list = new List<ITickable>();
+            foreach (var o in ObjectsToCheck)
+            {
+                list.AddRange(o.GetComponents<ITickable>());
+            }
+
+            Tickables = list.ToArray();
 
             StartCoroutine(TickClock());
         }

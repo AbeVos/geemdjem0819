@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using interfaces;
 using UnityEngine;
 
 public struct Ring
@@ -48,7 +49,7 @@ public struct Ring
 }
 
 [RequireComponent(typeof(MeshFilter))]
-public class PlantBranch : MonoBehaviour
+public class PlantBranch : MonoBehaviour, ITickable
 {
     public int nVertices = 8;
 
@@ -89,6 +90,8 @@ public class PlantBranch : MonoBehaviour
         branchRings.Add(new Ring(growBase, startRadius, nVertices));
 
         meshFilter = GetComponent<MeshFilter>();
+        
+        if (growTarget == null) growTarget = Camera.main.transform;
     }
 
     protected void Update()
@@ -102,13 +105,15 @@ public class PlantBranch : MonoBehaviour
 
         if (isGrowing)
         {
-            TickBranch();
+            Tick();
         }
     }
 
     /// Update the branch growing.
-    public void TickBranch()
+    public void Tick()
     {
+        if (!isActiveAndEnabled) return;
+
         // Rotate growBase towards its target and add some noise to the rotation.
         growBase.rotation = Quaternion.RotateTowards(
             growBase.rotation, growDirection, Mathf.PI * turnSpeed * Time.deltaTime

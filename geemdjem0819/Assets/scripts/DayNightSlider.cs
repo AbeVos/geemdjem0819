@@ -8,8 +8,8 @@ public class DayNightSlider : MonoBehaviour
 
     public Vector3 target;
 
-    private float previousValue;
-    private float speed = 1f;
+    private float _previousValue;
+    private const float Speed = 1f;
 
     private void Awake()
     {
@@ -17,25 +17,28 @@ public class DayNightSlider : MonoBehaviour
         slider.onValueChanged.AddListener(OnSliderChanged);
     }
 
-    void Update()
+    private void Update()
     {
         UpdateLight();
     }
-    void OnSliderChanged(float value)
+
+    private void OnSliderChanged(float value)
     {
+        var position = directionalLight.transform.position;
         target = new Vector3
         {
-            x = directionalLight.transform.position.x + 1,
-            y = directionalLight.transform.position.y - 1,
+            x = position.x + 1,
+            y = position.y - 1,
             z = (value - 0.5f) * 2
         };
     }
 
-    void UpdateLight()
+    private void UpdateLight()
     {
-        float step = speed * Time.deltaTime;
+        var step = Speed * Time.deltaTime;
 
-        Quaternion rotation = Quaternion.LookRotation(target, Vector3.up);
+        var rotation = Quaternion.LookRotation(target, Vector3.up);
+
         directionalLight.transform.rotation = Quaternion.Slerp(directionalLight.transform.rotation, rotation, step);
     }
 }
