@@ -22,7 +22,10 @@ public class Leaf : MonoBehaviour
     void Update()
     {
         timeAlive += Time.deltaTime;        
+    }
 
+    public void UpdateGrowth()
+    {
         transform.localScale = Vector3.one * targetSize * (1 - Mathf.Exp(-timeAlive / growthFalloff));
     }
 

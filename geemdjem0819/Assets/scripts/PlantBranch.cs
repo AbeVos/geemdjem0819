@@ -7,28 +7,56 @@ public struct Ring
 {
     private List<Vector3> vertices;
 
-    public Vector3 position;
+    private Vector3 _position;
     public Quaternion rotation;
     public Vector3 scale;
 
-    public Ring(Transform transform, float radius, int nVertices)
+    private Transform parent;
+
+    private List<Transform> children;
+
+    public Ring(Transform transform, float radius, int nVertices, Transform parent)
     {
         vertices = new List<Vector3>();
-        position = transform.position;
-        rotation = transform.rotation;
+        _position = transform.localPosition;
+        rotation = transform.localRotation;
         scale = transform.localScale;
+
+        this.parent = parent;
+
+        children = new List<Transform>();
 
         // Generate vertices in a circle.
         for (int i = 0; i < nVertices; i++)
         {
             var t = 2 * Mathf.PI * i / nVertices;
 
-            var x = radius * Mathf.Cos(t);
-            var z = radius * Mathf.Sin(t);
+            // var x = radius * Mathf.Cos(t);
+            // var z = radius * Mathf.Sin(t);
+            var variance = (1 + 0.2f * Mathf.Cos(2 * Mathf.PI * nVertices * t));
+            var x = variance * radius * Mathf.Cos(t);
+            var z = variance * radius * Mathf.Sin(t);
 
             var vertex = new Vector3(x, 0, z);
 
             vertices.Add(vertex);
+        }
+    }
+
+    public void Add(Transform child)
+    {
+        children.Add(child);
+    }
+
+    public Vector3 position {
+        get { return _position; }
+        set {
+            _position = value;
+
+            foreach (Transform child in children)
+            {
+                child.position = value + parent.position;
+            }
         }
     }
 
@@ -37,7 +65,7 @@ public struct Ring
     {
         get
         {
-            var matrix = Matrix4x4.TRS(position, rotation, scale);
+            var matrix = Matrix4x4.TRS(position, rotation.GetNormalized(), scale);
 
             var transformedVertices = new List<Vector3>();
 
@@ -77,9 +105,13 @@ public class PlantBranch : MonoBehaviour, ITickable
     public Transform growTarget;
 
     public GameObject[] leafPrefabs;
+    public GameObject flowerPrefab;
 
     public float leafSize = 1f;
     public float leafDensity = 1f;
+
+    public float generationInterval = 1f;
+    public float wiggle = 1f;
 
     // Global direction of growth.
     private Transform growBase;
@@ -94,15 +126,20 @@ public class PlantBranch : MonoBehaviour, ITickable
     private List<Ring> branchRings;
     private List<Leaf> leafs;
 
+    private int ticks;
+
+    private float lastGeneration = 0f;
+
     protected void Start() {
         growBase = new GameObject().transform;
+        growBase.position = transform.position;
         growBase.parent = transform;
         lastPosition = growBase.position;
         growDirection = new Quaternion();
 
         branchRings = new List<Ring>();
         leafs = new List<Leaf>();
-        branchRings.Add(new Ring(growBase, startRadius, nVertices));
+        branchRings.Add(new Ring(growBase, startRadius, nVertices, transform));
 
         meshFilter = GetComponent<MeshFilter>();
         
@@ -125,7 +162,17 @@ public class PlantBranch : MonoBehaviour, ITickable
             Tick();
         }
 
-        // TickLeafs();
+        if (Input.GetKeyDown("space"))
+        {
+            GrowFlower();
+            IsGrowing = false;
+        }
+
+        if (Time.time - lastGeneration > generationInterval)
+        {
+            GenerateMesh();
+            lastGeneration = Time.time;
+        }
     }
 
     /// Update the branch growing.
@@ -149,19 +196,36 @@ public class PlantBranch : MonoBehaviour, ITickable
         {
             lastPosition = position;
 
-            branchRings.Add(new Ring(growBase, startRadius, nVertices));
-            GenerateMesh();
+            Leaf leaf = null;
 
             if (Random.value < leafDensity)
             {
-                AddLeaf();
+                leaf = AddLeaf();
             }
+
+            var ring = new Ring(growBase, startRadius, nVertices, transform);
+
+            if (leaf != null)
+            {
+                // ring.leaf = leaf;
+                ring.Add(leaf.transform);
+            }
+
+            branchRings.Add(ring);
+            // GenerateMesh();
         }
+
+        ticks++;
     }
 
     /// Instantiate a new leaf and store it.
     public Leaf AddLeaf()
     {
+        if (leafPrefabs.Length == 0)
+        {
+            return null;
+        }
+
         var leafIndex = Random.Range(0, leafPrefabs.Length);
         var prefab = leafPrefabs[leafIndex];
 
@@ -180,15 +244,35 @@ public class PlantBranch : MonoBehaviour, ITickable
         return leaf;
     }
 
+    public GameObject GrowFlower()
+    {
+        var flowerObject = Instantiate(flowerPrefab, growBase);
+
+        branchRings[branchRings.Count - 1].Add(flowerObject.transform);
+
+        return flowerObject;
+    }
+
     /// Update the MeshFilter's mesh using the branchRings' vertices.
     public void GenerateMesh()
     {
         var vertexList = new List<Vector3>();
 
+        var rotation = Quaternion.identity;
+
         for (var i = 0; i < branchRings.Count; i++)
         {
             var ring = branchRings[i];
             var iInv = branchRings.Count - i;
+
+            // rotation *= Random.rotation.Pow(wiggle * Mathf.Exp(-Time.deltaTime * ticks));
+            rotation *= Random.rotation.Pow(wiggle / ticks);
+
+            var dir = ring.position - transform.position;
+            dir = rotation * dir;
+            ring.position = dir + transform.position;
+
+            ring.rotation *= rotation;
 
             ring.scale = branchRadius * Vector3.one * (1 - Mathf.Exp(-1 / growthFalloff * iInv));
 
@@ -215,6 +299,11 @@ public class PlantBranch : MonoBehaviour, ITickable
 
         meshFilter.mesh.triangles = tris;
         meshFilter.mesh.RecalculateNormals();
+
+        foreach (Leaf leaf in leafs)
+        {
+            leaf.UpdateGrowth();   
+        }
     }
 
     private Quaternion YLookRotation(Vector3 right, Vector3 up)
