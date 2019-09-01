@@ -343,7 +343,11 @@ MonoBehaviour:
   directionVariance: 4
   growTarget: {fileID: 208634664}
   leafPrefabs:
-  - {fileID: 6954913047580166929, guid: dc08f595617d61240a47f0d3f9e3086e, type: 3}
+  - {fileID: 7326338571935112687, guid: 14140b1d0d2ca7b4d8a06f9c5e43e375, type: 3}
+  - {fileID: 7461865512077677432, guid: caa703c43a48aad4998a69a6a877a239, type: 3}
+  - {fileID: 8936456225528280960, guid: f666cba42061c1c419f58f661b81b47b, type: 3}
+  - {fileID: 1907248584899936221, guid: 10f665b241de5474595384390b91c215, type: 3}
+  - {fileID: 463072869969761820, guid: 06d86265df9244a45a0827ea5926a62d, type: 3}
   leafSize: 10
   leafDensity: 0.1
 --- !u!4 &1213970900
