@@ -1,66 +1,56 @@
-﻿using UnityEngine;
+﻿using interfaces;
+using UnityEngine;
 
 public class DragManager : MonoBehaviour
 {
-    public float catchingDistance = 3f;
     private Camera _camera;
-    private bool IsDraggingAnObject { get; set; }
+    private bool _isDraggingAnObject;
+    private Rigidbody _draggableRigidBody;
 
-    private Rigidbody _draggingRigidBody;
-    private bool _foundRigidBody;
+    private ILooker _lookScript;
+    private IDraggable _dragScript;
 
     private void Awake()
     {
         _camera = Camera.main;
     }
 
-    protected void Start()
-    {
-        IsDraggingAnObject = false;
-    }
-
     protected void Update()
     {
         if (Input.GetMouseButton(0))
         {
-            if (!IsDraggingAnObject)
+            if (!_isDraggingAnObject)
             {
-                _foundRigidBody = GetObjectFromMouseRaycast(out _draggingRigidBody);
-                if (!_foundRigidBody) return;
+                var foundDraggableRigidBody = CheckForDraggableRigidBody(out _draggableRigidBody);
+                if (!foundDraggableRigidBody) return;
                 
-                
-                var isDraggable = _draggingRigidBody.GetComponent<IDraggable>();
-                if (isDraggable != null && isDraggable.isDraggable)
-                {
-                    _draggingRigidBody.isKinematic = true;
-                    IsDraggingAnObject = true;
-                }
-            }
-            else if (_foundRigidBody)
-            {
-                _draggingRigidBody.MovePosition(GetMouseWorldSpacePosition());
+                StartDragging();
             }
         }
-        else
+        if (Input.GetMouseButton(0) && _isDraggingAnObject)
         {
-            if (_foundRigidBody)
-            {
-                _draggingRigidBody.isKinematic = false;
-            }
-            IsDraggingAnObject = false;
-            _foundRigidBody = false;
+            Drag();
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+           StopDragging();
         }
     }
 
-    private bool GetObjectFromMouseRaycast(out Rigidbody foundRb)
+    private bool CheckForDraggableRigidBody(out Rigidbody foundRb)
     {
         foundRb = null;
         var hit = Physics.Raycast(_camera.ScreenPointToRay(Input.mousePosition), out var hitInfo);
-        
-        if (hit && hitInfo.rigidbody && Vector3.Distance(hitInfo.point, transform.position) <= catchingDistance)
+
+        if (hit && hitInfo.rigidbody )
         {
-            foundRb = hitInfo.rigidbody;
-            return true;
+            _dragScript = hitInfo.transform.GetComponent<IDraggable>();
+            if (_dragScript != null && _dragScript.IsDraggable)
+            {
+                foundRb = hitInfo.rigidbody; 
+                return true;
+            }
         }
         return false;
     }
@@ -68,8 +58,33 @@ public class DragManager : MonoBehaviour
     private Vector3 GetMouseWorldSpacePosition()
     {
         var mouseWorldPosition = Input.mousePosition;
-        mouseWorldPosition.z = catchingDistance;
+        mouseWorldPosition.z = 4; //todo: design non-crappy solution
         mouseWorldPosition = _camera.ScreenToWorldPoint(mouseWorldPosition);
         return mouseWorldPosition;
+    }
+    
+    
+    private void StartDragging()
+    {
+        _isDraggingAnObject = true;
+        _dragScript.SetKinematic(true);
+        _lookScript = _draggableRigidBody.GetComponent<ILooker>();
+        _lookScript?.StartLooking();
+    }
+
+    private void Drag()
+    {
+        _draggableRigidBody.MovePosition(GetMouseWorldSpacePosition());
+    }
+
+    private void StopDragging()
+    {
+        if (_draggableRigidBody == null) return;
+        
+        _dragScript.SetKinematic(false);
+        _lookScript?.StopLooking();
+
+        _draggableRigidBody = null;
+        _isDraggingAnObject = false;
     }
 }

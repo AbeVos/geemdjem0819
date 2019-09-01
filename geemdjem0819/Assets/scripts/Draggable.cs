@@ -1,11 +1,21 @@
-﻿using UnityEngine;
+﻿using System;
+using interfaces;
+using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class Draggable : MonoBehaviour, IDraggable
 {
-    public bool isDraggable { get; set; }
+    private Rigidbody _rigidBody;
+    public bool IsDraggable { get; set; }
 
     protected void Awake()
     {
-        isDraggable = true;
+        IsDraggable = true;
+        _rigidBody = GetComponent<Rigidbody>();
+    }
+
+    public void SetKinematic(bool startDragging)
+    {
+        _rigidBody.isKinematic = startDragging;
     }
 }
