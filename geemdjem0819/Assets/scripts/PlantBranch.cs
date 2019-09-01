@@ -18,7 +18,9 @@ public struct Ring
         rotation = transform.rotation;
         scale = transform.localScale;
 
-        for (int i = 0; i < nVertices; i++) {
+        // Generate vertices in a circle.
+        for (int i = 0; i < nVertices; i++)
+        {
             var t = 2 * Mathf.PI * i / nVertices;
 
             var x = radius * Mathf.Cos(t);
@@ -33,7 +35,8 @@ public struct Ring
     /// Retrieve transformed vertices from this Ring.
     public List<Vector3> Vertices
     {
-        get {
+        get
+        {
             var matrix = Matrix4x4.TRS(position, rotation, scale);
 
             var transformedVertices = new List<Vector3>();
@@ -46,6 +49,14 @@ public struct Ring
         }
         private set { vertices = value; }
     }
+
+    public Matrix4x4 TRS
+    {
+        get
+        {
+            return Matrix4x4.TRS(position, rotation, scale);
+        }
+    }
 }
 
 [RequireComponent(typeof(MeshFilter))]
@@ -55,7 +66,7 @@ public class PlantBranch : MonoBehaviour, ITickable
 
     public float branchRadius = 1f;
     public float startRadius = 1f;
-    public float tipFalloff = 5f;
+    public float growthFalloff = 5f;
 
     public float segmentLength = 1f;
     public float growSpeed = 1f;
@@ -65,19 +76,23 @@ public class PlantBranch : MonoBehaviour, ITickable
 
     public Transform growTarget;
 
+    public GameObject[] leafPrefabs;
+
+    public float leafSize = 1f;
+    public float leafDensity = 1f;
+
     // Global direction of growth.
     private Transform growBase;
     // Last position (local) where a branch segment has been spawned.
     private Vector3 lastPosition;
     private Quaternion growDirection;
 
-    private bool isGrowing = true;
     public bool IsGrowing { get; set; }
 
     private MeshFilter meshFilter;
 
-    private List<Transform> branchSegments;
     private List<Ring> branchRings;
+    private List<Leaf> leafs;
 
     protected void Start() {
         growBase = new GameObject().transform;
@@ -85,13 +100,15 @@ public class PlantBranch : MonoBehaviour, ITickable
         lastPosition = growBase.position;
         growDirection = new Quaternion();
 
-        branchSegments = new List<Transform>();
         branchRings = new List<Ring>();
+        leafs = new List<Leaf>();
         branchRings.Add(new Ring(growBase, startRadius, nVertices));
 
         meshFilter = GetComponent<MeshFilter>();
         
         if (growTarget == null) growTarget = Camera.main.transform;
+
+        IsGrowing = true;
     }
 
     protected void Update()
@@ -103,10 +120,12 @@ public class PlantBranch : MonoBehaviour, ITickable
             growDirection = YLookRotation(direction.normalized, Vector3.up);
         }
 
-        if (isGrowing)
+        if (IsGrowing)
         {
             Tick();
         }
+
+        // TickLeafs();
     }
 
     /// Update the branch growing.
@@ -132,7 +151,33 @@ public class PlantBranch : MonoBehaviour, ITickable
 
             branchRings.Add(new Ring(growBase, startRadius, nVertices));
             GenerateMesh();
+
+            if (Random.value < leafDensity)
+            {
+                AddLeaf();
+            }
         }
+    }
+
+    /// Instantiate a new leaf and store it.
+    public Leaf AddLeaf()
+    {
+        var leafIndex = Random.Range(0, leafPrefabs.Length);
+        var prefab = leafPrefabs[leafIndex];
+
+        // var rotation = Quaternion.FromToRotation(Vector3.up, growBase.forward);
+        var leafObject = Instantiate(prefab, growBase.position, Quaternion.identity);
+        leafObject.transform.eulerAngles += Vector3.up * 360 * Random.value;
+        leafObject.transform.localEulerAngles += Vector3.right * 60 * (Random.value - 0.5f);
+
+        leafObject.transform.localScale = Vector3.zero;
+        leafObject.transform.parent = this.transform;
+
+        var leaf = leafObject.GetComponent<Leaf>();
+
+        leafs.Add(leaf);
+
+        return leaf;
     }
 
     /// Update the MeshFilter's mesh using the branchRings' vertices.
@@ -145,7 +190,7 @@ public class PlantBranch : MonoBehaviour, ITickable
             var ring = branchRings[i];
             var iInv = branchRings.Count - i;
 
-            ring.scale = branchRadius * Vector3.one * (1 - Mathf.Exp(-1 / tipFalloff * iInv));
+            ring.scale = branchRadius * Vector3.one * (1 - Mathf.Exp(-1 / growthFalloff * iInv));
 
             vertexList.AddRange(ring.Vertices);
         }
