@@ -105,13 +105,10 @@ public class PlantBranch : MonoBehaviour, ITickable
         branchRings.Add(new Ring(growBase, startRadius, nVertices));
 
         meshFilter = GetComponent<MeshFilter>();
-<<<<<<< HEAD
         
         if (growTarget == null) growTarget = Camera.main.transform;
-=======
 
         IsGrowing = true;
->>>>>>> 31430b3b9b3136dcbbaa929b1a71dabe7c15d49a
     }
 
     protected void Update()
