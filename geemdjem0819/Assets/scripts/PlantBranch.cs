@@ -7,16 +7,20 @@ public struct Ring
 {
     private List<Vector3> vertices;
 
-    public Vector3 position;
+    public Vector3 _position;
     public Quaternion rotation;
     public Vector3 scale;
+
+    public Leaf leaf;
 
     public Ring(Transform transform, float radius, int nVertices)
     {
         vertices = new List<Vector3>();
-        position = transform.position;
+        _position = transform.position;
         rotation = transform.rotation;
         scale = transform.localScale;
+
+        leaf = null;
 
         // Generate vertices in a circle.
         for (int i = 0; i < nVertices; i++)
@@ -29,6 +33,18 @@ public struct Ring
             var vertex = new Vector3(x, 0, z);
 
             vertices.Add(vertex);
+        }
+    }
+
+    public Vector3 position {
+        get { return _position; }
+        set {
+            _position = value;
+
+            if (leaf !=null)
+            {
+                leaf.transform.position = value;
+            }
         }
     }
 
@@ -95,6 +111,9 @@ public class PlantBranch : MonoBehaviour, ITickable
     private List<Ring> branchRings;
     private List<Leaf> leafs;
 
+    private int ticks;
+    private float wiggle = 0.01f;
+
     protected void Start() {
         growBase = new GameObject().transform;
         growBase.parent = transform;
@@ -154,14 +173,25 @@ public class PlantBranch : MonoBehaviour, ITickable
         {
             lastPosition = position;
 
-            branchRings.Add(new Ring(growBase, startRadius, nVertices));
-            GenerateMesh();
+            Leaf leaf = null;
 
             if (Random.value < leafDensity)
             {
-                AddLeaf();
+                leaf = AddLeaf();
             }
+
+            var ring = new Ring(growBase, startRadius, nVertices);
+
+            if (leaf != null)
+            {
+                ring.leaf = leaf;
+            }
+
+            branchRings.Add(ring);
+            GenerateMesh();
         }
+
+        ticks++;
     }
 
     /// Instantiate a new leaf and store it.
@@ -197,10 +227,21 @@ public class PlantBranch : MonoBehaviour, ITickable
     {
         var vertexList = new List<Vector3>();
 
+        var rotation = Quaternion.identity;
+
         for (var i = 0; i < branchRings.Count; i++)
         {
             var ring = branchRings[i];
             var iInv = branchRings.Count - i;
+
+            // rotation *= Random.rotation.Pow(wiggle * Mathf.Exp(-Time.deltaTime * ticks));
+            rotation *= Random.rotation.Pow(1f/ticks);
+
+            var dir = ring.position - transform.position;
+            dir = rotation * dir;
+            ring.position = dir + transform.position;
+
+            ring.rotation *= rotation;
 
             ring.scale = branchRadius * Vector3.one * (1 - Mathf.Exp(-1 / growthFalloff * iInv));
 
