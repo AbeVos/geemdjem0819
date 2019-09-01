@@ -1,5 +1,6 @@
 ﻿using interfaces;
 using mechanics.nutrients;
+using plant;
 using UnityEngine;
 
 namespace mechanics

@@ -1,5 +1,3 @@
-using System;
-using interfaces;
 using UnityEngine;
 
 namespace mechanics.nutrients
