@@ -53,7 +53,7 @@ public struct Ring
     {
         get
         {
-            var matrix = Matrix4x4.TRS(position, rotation, scale);
+            var matrix = Matrix4x4.TRS(position, rotation.GetNormalized(), scale);
 
             var transformedVertices = new List<Vector3>();
 
@@ -98,6 +98,9 @@ public class PlantBranch : MonoBehaviour, ITickable
     public float leafSize = 1f;
     public float leafDensity = 1f;
 
+    public float generationInterval = 1f;
+    public float wiggle = 1f;
+
     // Global direction of growth.
     private Transform growBase;
     // Last position (local) where a branch segment has been spawned.
@@ -112,7 +115,8 @@ public class PlantBranch : MonoBehaviour, ITickable
     private List<Leaf> leafs;
 
     private int ticks;
-    private float wiggle = 0.01f;
+
+    private float lastGeneration = 0f;
 
     protected void Start() {
         growBase = new GameObject().transform;
@@ -149,6 +153,12 @@ public class PlantBranch : MonoBehaviour, ITickable
         {
             GrowFlower();
             IsGrowing = false;
+        }
+
+        if (Time.time - lastGeneration > generationInterval)
+        {
+            GenerateMesh();
+            lastGeneration = Time.time;
         }
     }
 
@@ -188,7 +198,7 @@ public class PlantBranch : MonoBehaviour, ITickable
             }
 
             branchRings.Add(ring);
-            GenerateMesh();
+            // GenerateMesh();
         }
 
         ticks++;
@@ -218,6 +228,7 @@ public class PlantBranch : MonoBehaviour, ITickable
     public GameObject GrowFlower()
     {
         var flowerObject = Instantiate(flowerPrefab, growBase);
+        flowerObject.transform.parent = growBase;
 
         return flowerObject;
     }
@@ -235,7 +246,7 @@ public class PlantBranch : MonoBehaviour, ITickable
             var iInv = branchRings.Count - i;
 
             // rotation *= Random.rotation.Pow(wiggle * Mathf.Exp(-Time.deltaTime * ticks));
-            rotation *= Random.rotation.Pow(1f/ticks);
+            rotation *= Random.rotation.Pow(wiggle / ticks);
 
             var dir = ring.position - transform.position;
             dir = rotation * dir;
@@ -268,6 +279,11 @@ public class PlantBranch : MonoBehaviour, ITickable
 
         meshFilter.mesh.triangles = tris;
         meshFilter.mesh.RecalculateNormals();
+
+        foreach (Leaf leaf in leafs)
+        {
+            leaf.UpdateGrowth();   
+        }
     }
 
     private Quaternion YLookRotation(Vector3 right, Vector3 up)
