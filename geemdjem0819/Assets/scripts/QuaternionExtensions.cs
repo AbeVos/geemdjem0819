@@ -30,4 +30,11 @@ public static class QuaternionExtensions
 	{
 		return new Quaternion(input.x * scalar, input.y * scalar, input.z * scalar, input.w * scalar);
 	}
+
+	/// Normalize the Quaternion.
+	public static Quaternion GetNormalized(this Quaternion q)
+	{
+		float f = 1f / Mathf.Sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
+		return new Quaternion(q.x*f, q.y*f, q.z*f, q.w*f);
+	}
 }
