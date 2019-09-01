@@ -77,6 +77,7 @@ public class PlantBranch : MonoBehaviour, ITickable
     public Transform growTarget;
 
     public GameObject[] leafPrefabs;
+    public GameObject flowerPrefab;
 
     public float leafSize = 1f;
     public float leafDensity = 1f;
@@ -125,7 +126,11 @@ public class PlantBranch : MonoBehaviour, ITickable
             Tick();
         }
 
-        // TickLeafs();
+        if (Input.GetKeyDown("space"))
+        {
+            GrowFlower();
+            IsGrowing = false;
+        }
     }
 
     /// Update the branch growing.
@@ -178,6 +183,13 @@ public class PlantBranch : MonoBehaviour, ITickable
         leafs.Add(leaf);
 
         return leaf;
+    }
+
+    public GameObject GrowFlower()
+    {
+        var flowerObject = Instantiate(flowerPrefab, growBase);
+
+        return flowerObject;
     }
 
     /// Update the MeshFilter's mesh using the branchRings' vertices.

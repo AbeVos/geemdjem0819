@@ -348,8 +348,10 @@ MonoBehaviour:
   - {fileID: 8936456225528280960, guid: f666cba42061c1c419f58f661b81b47b, type: 3}
   - {fileID: 1907248584899936221, guid: 10f665b241de5474595384390b91c215, type: 3}
   - {fileID: 463072869969761820, guid: 06d86265df9244a45a0827ea5926a62d, type: 3}
+  flowerPrefab: {fileID: 4099485760113703965, guid: 0a93b242d7335394d985e44b89d0f1ea,
+    type: 3}
   leafSize: 10
-  leafDensity: 0.1
+  leafDensity: 0.2
 --- !u!4 &1213970900
 Transform:
   m_ObjectHideFlags: 0
@@ -389,7 +391,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 5775865398287329665, guid: 179d4f28e9f7b08429a1bbbb926b4609, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
