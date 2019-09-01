@@ -1,5 +1,3 @@
-using interfaces;
-
 namespace mechanics.nutrients
 {
     public class SunLight : Nutrient

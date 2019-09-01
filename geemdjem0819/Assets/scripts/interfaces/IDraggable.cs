@@ -1,4 +1,7 @@
-﻿public interface IDraggable
+﻿namespace interfaces
 {
-    bool isDraggable { get; set; }
+    public interface IDraggable
+    {
+        bool isDraggable { get; set; }
+    }
 }
